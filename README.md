@@ -9,7 +9,7 @@ Esse commit contém o código utilizado, também da forma na qual ele foi utiliz
 
 ## Circuito eletrônico utilizado
 
-o circuito utilizado para esse teste foi o montado de acordo com o esquema contido nos arquivos `circuit.pdf` e `circuit_tinkercad.png` desse commit. Nos circuitos apresentados, o ESC é representado pelo Servo motor. O Servo motor está conectado na porta que fornece energia para o arduino por que é o que o ESC fará. E o ESC receberá energia de uma bateria.
+o circuito utilizado para esse teste foi o montado de acordo com o esquema contido nos arquivos [`circuit.pdf` e `circuit_tinkercad.png`](https://www.tinkercad.com/things/ggH5kDln1wO?sharecode=jc-2vKZIE1H_gMENZ2VtN5nHOZScC-aSmRbJjL0fbHc) desse commit. Nos circuitos apresentados, o ESC é representado pelo Servo motor. O Servo motor está conectado na porta que fornece energia para o arduino por que é o que o ESC fará. E o ESC receberá energia de uma bateria.
 
 ## Intuito e resultados
 
