@@ -7,8 +7,8 @@ Uma descrição mais completa do intuito do teste, curcuito e resultados estarã
 
 ## Circuito eletrônico utilizado
 
-o circuito utilizado para esse teste foi apenas o arduino + protoborad + jumpers e o sensor ultrassônico conectados.
+o circuito utilizado para esse teste foi apenas o arduino + protoborad + jumpers e o sensor infravermelho conectados.
 
 ## Intuito e resultados
 
-O objetivo do teste era ver se os sensores estavam funcionando e os valores que eles mediam. Já foi realizada também a **calibração dos sensores**, no caso dos sensores ultrassônicos, nenhum estava com problemas fora da faixa de leitura necessária(1,5m a partir do sensor). Notou-se que os sensores perdem a precisão quando medindo a partir de 1.7 m apesar de que eles normalmente operam na range entre 3cm e 4 m. Porém todos estavam funcionando para a range do tamanho da arena do robô(1.5m).
+O objetivo do teste era ver se os sensores estavam funcionando e os valores que eles mediam. Já foi realizada também a **calibração dos sensores**, no caso dos sensores infravermelho, apenas um deles estava com a sensibilidade descalibrada, fazendo com que ele se ativasse muito antes dos outros, porém utilizou-se uma have phillips para regular a sensibilidade do mesmo, deixam igual a dos outros. No final do teste e calibração, todos estavam se ativado ao mesmo tempo e funcionando de acordo com o planejado.
