@@ -29,7 +29,7 @@
  * The following are the setting for the ESC used, for other ESC, just chnage setting according to
  * ESC Spec
  *///////////////////////////////////////////////////////////////////////////////////////////////////////
-#define THROTTLE_MIN        1000
+#define THROTTLE_MIN        1000  /* Jamais mudar */
 #define THROTTLE_MAX        2000
 #define THROTTLE_BAKE       1000
 // End of ESC setting ///////////////////////////////////////////////////////////////////////////////////
