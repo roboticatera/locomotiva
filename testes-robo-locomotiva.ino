@@ -29,12 +29,12 @@ enum aceleracao : int // no arduino short é 2 bytes, então os valores só vão
 	maxima = 1800
 };
 
-Bounce botao_frente = Bounce();
-Bounce botao_tras = Bounce();
-Bounce botao_funcionamento = Bounce();
+Bounce bounce_frente = Bounce();
+Bounce bounce_tras = Bounce();
+Bounce bounce_funcionamento = Bounce();
 int aceleracao_atual{aceleracao::nula};
 boolean startReading{false};
-Servo ESC;
+Servo s_ESC;
 int throttle{aceleracao::nula};
 
 void setup()
@@ -45,14 +45,14 @@ void setup()
 	pinMode(pino::botao_tras, INPUT_PULLUP);
 	pinMode(pino::botao_frente, INPUT_PULLUP);
 	pinMode(pino::led_funcionamento, OUTPUT);
-	botao_frente.attach(pino::botao_frente);
-	botao_frente.interval(5);
-	botao_tras.attach(pino::botao_tras);
-	botao_tras.interval(5);
-	botao_funcionamento.attach(pino::botao_funcionamento);
-	botao_funcionamento.interval(5);
-	ESC.attach(pino::ESC);
-	ESC.writeMicroseconds(aceleracao::nula);
+	bounce_frente.attach(pino::botao_frente);
+	bounce_frente.interval(5);
+	bounce_tras.attach(pino::botao_tras);
+	bounce_tras.interval(5);
+	bounce_funcionamento.attach(pino::botao_funcionamento);
+	bounce_funcionamento.interval(5);
+	s_ESC.attach(pino::ESC);
+	s_ESC.writeMicroseconds(aceleracao::nula);
 
 	digitalWrite(pino::led_funcionamento, HIGH);
 	delay(1000);
@@ -62,7 +62,7 @@ void setup()
 void loop()
 {
 
-	if (botao_funcionamento.fell())
+	if (bounce_funcionamento.fell())
 	{ // button pressed
 		if (!startReading)
 		{												// if not in reading mode
@@ -72,7 +72,7 @@ void loop()
 		}
 		else
 		{												   // currently in reading mode, should stop reading and brake DC brushed motor
-			ESC.writeMicroseconds(aceleracao::nula); // brake DC brushed motor
+			s_ESC.writeMicroseconds(aceleracao::nula); // brake DC brushed motor
 			startReading = false;						   // change to stop reading mode
 			throttle = aceleracao::nula;
 			digitalWrite(pino::led_funcionamento, LOW); // off the onboard LED, for visual indicator
@@ -82,19 +82,19 @@ void loop()
 
 	if (startReading)
 	{ // in reading mode
-		if(botao_frente.fell())
+		if(bounce_frente.fell())
 		{
 			// o (void) normalmente é interpretado pelos compiladores como um sinal de que 
 			// o resultado pode ser ignorado, facilitando na parte de otimizações, e para não disperdiçar memória
-			(void)botao_tras.fell(); // limpa o status do botao_tras pra evitar que ambos sejam apertados em rápida
+			(void)bounce_tras.fell(); // limpa o status do botao_tras pra evitar que ambos sejam apertados em rápida
 									 // sucessão e que os comandos sejam transmitidos rapidamente em sequência
-			ESC.writeMicroseconds(aceleracao::maxima); 
+			s_ESC.writeMicroseconds(aceleracao::maxima); 
 		}
-		else if(botao_tras.fell())
+		else if(bounce_tras.fell())
 		{
-			(void)botao_frente.fell(); // limpa o status do botao_tras pra evitar que ambos sejam apertados em rápida
+			(void)bounce_frente.fell(); // limpa o status do botao_tras pra evitar que ambos sejam apertados em rápida
 									   // sucessão e que os comandos sejam transmitidos rapidamente em sequência
-			ESC.writeMicroseconds(aceleracao::re);// ré
+			s_ESC.writeMicroseconds(aceleracao::re);// ré
 		}
 
 	}
