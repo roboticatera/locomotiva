@@ -26,6 +26,8 @@ enum aceleracao : int // no arduino short é 2 bytes, então os valores só vão
     maxima = 1800
 };
 
+
+//referencia da bounce no readme
 Bounce bounce_frente = Bounce();
 Bounce bounce_tras = Bounce();
 Bounce bounce_reset = Bounce();

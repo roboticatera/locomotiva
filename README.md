@@ -16,3 +16,18 @@ o circuito utilizado para esse teste foi o montado de acordo com o esquema conti
 O objetivo desse teste é estudar a reação do ESC agora sendo invertido totalmente pelo arduino, se a resposta será a mesma que obtemos quando testando o ESC com o radio controle. 
 
 Até o momento desse commit apenas uma tentativa foi realizada, devido a falta de tempo, ela foi interrompida no meio e não foi bem sucedida, o motor girou brevemente mas na maior parte do tempo ele não reagia, nem o led de funcionamento chegou a ascender, então atualmente é provavel que tenha algum problema no circuito ou na programação.
+
+
+
+## explicação da `Bounce`
+
+A bounce é uma biblioteca para lidar com o estado dos botões, provendo funções para avaliar se o botão foi pressionado, aliviado ou clicado.
+
+o único requisito é chamar em cada bounce a função `.update()` em cada instância do bounce para atualizar os estados, após isso, pode-se utilizar qualquer função desejada.
+
+para evitar ruídos, utiliza-se os inputs do bounce como `INPUT_PULLUP`.
+
+
+
+
+
