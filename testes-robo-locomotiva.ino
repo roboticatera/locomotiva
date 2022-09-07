@@ -1,5 +1,6 @@
-#include "Bounce2.h"
-#include <Servo.h>
+#include "comandos_movimento.h"
+
+using namespace Tera::movimento; //namespace definido dentro de comandos_movimento.h
 
 // minha proposição de trocas as constantes por enumerações pra aumentar a expressividade do código
 // const int pino_ESC = 3; // PIN to control ESC, normally the white wire from ESC
@@ -18,22 +19,17 @@ enum pino : short // no arduino short é 1 byte, então os valores só vão até
     led_funcionamento = 8
 };
 
-enum aceleracao : int // no arduino short é 2 bytes, então os valores só vão até 65535
-{
-    minima = 1080,
-    re = 1080, // para auxiliar também na expressividade do código
-    nula = 1480,
-    maxima = 1800
-};
 
 
-//referencia da bounce no readme
+// referencia da bounce no readme
 Bounce bounce_frente = Bounce();
 Bounce bounce_tras = Bounce();
 Bounce bounce_reset = Bounce();
 int aceleracao_atual{aceleracao::nula};
 Servo s_ESC;
 int throttle{aceleracao::nula};
+
+
 
 void setup()
 {
@@ -50,6 +46,13 @@ void setup()
     bounce_reset.attach(pino::botao_funcionamento);
     bounce_reset.interval(5);
     s_ESC.attach(pino::ESC);
+    s_ESC.writeMicroseconds(aceleracao::maxima);
+    delay(2000);
+    recuar(s_ESC);
+    delay(2000);
+
+
+
     s_ESC.writeMicroseconds(aceleracao::nula);
 }
 
@@ -79,6 +82,7 @@ void loop()
         (void)bounce_reset.fell();
         (void)bounce_frente.fell();              // limpa o status do botao_tras pra evitar que ambos sejam apertados em rápida
                                                  // sucessão e que os comandos sejam transmitidos rapidamente em sequência
-        s_ESC.writeMicroseconds(aceleracao::re); // ré
+        recuar(s_ESC);
+        Serial.println("Ré"); // ré
     }
 }
