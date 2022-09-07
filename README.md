@@ -3,12 +3,31 @@ Repositório destinado para o controle dos códigos utilizados nos testes e estu
 
 Uma descrição mais completa do intuito do teste, curcuito e resultados estarão no readme de cada teste
 
-# Teste dos sensores ultrassônicos
+# Teste de controle do ESC sem utilização do potenciômetro
+
+Esse commit contém o código utilizado, também da forma na qual ele foi utilizado para realizar o teste do ESC sem potenciometro, o arquivo principal do sketch é o `testes-robo-locomotiva.ino`, que tem como base o arquivo `ControlESC_Turnigy.ino` da biblioteca [`Arduino-Control-Brushed-ESC`](https://github.com/tungstenexe/Arduino-Control-Brushed-ESC) refatorado para utilização dentro do Tera.
 
 ## Circuito eletrônico utilizado
 
-o circuito utilizado para esse teste foi apenas o arduino + protoborad + jumpers e o sensor infravermelho conectados.
+o circuito utilizado para esse teste foi o montado de acordo com o esquema contido nos arquivos [`circuit.pdf` e `circuit_tinkercad.png`](https://www.tinkercad.com/things/ggH5kDln1wO?sharecode=jc-2vKZIE1H_gMENZ2VtN5nHOZScC-aSmRbJjL0fbHc) desse commit. Nos circuitos apresentados, o ESC é representado pelo Servo motor. O Servo motor está conectado na porta que fornece energia para o arduino por que é o que o ESC fará. E o ESC receberá energia de uma bateria.
 
 ## Intuito e resultados
 
-O objetivo do teste era ver se os sensores estavam funcionando e os valores que eles mediam. Já foi realizada também a **calibração dos sensores**, no caso dos sensores infravermelho, apenas um deles estava com a sensibilidade descalibrada, fazendo com que ele se ativasse muito antes dos outros, porém utilizou-se uma have phillips para regular a sensibilidade do mesmo, deixam igual a dos outros. No final do teste e calibração, todos estavam se ativado ao mesmo tempo e funcionando de acordo com o planejado.
+O objetivo desse teste é estudar a reação do ESC agora sendo invertido totalmente pelo arduino, se a resposta será a mesma que obtemos quando testando o ESC com o radio controle. 
+
+Até o momento desse commit apenas uma tentativa foi realizada, devido a falta de tempo, ela foi interrompida no meio e não foi bem sucedida, o motor girou brevemente mas na maior parte do tempo ele não reagia, nem o led de funcionamento chegou a ascender, então atualmente é provavel que tenha algum problema no circuito ou na programação.
+
+
+
+## explicação da `Bounce`
+
+A bounce é uma biblioteca para lidar com o estado dos botões, provendo funções para avaliar se o botão foi pressionado, aliviado ou clicado.
+
+o único requisito é chamar em cada bounce a função `.update()` em cada instância do bounce para atualizar os estados, após isso, pode-se utilizar qualquer função desejada.
+
+para evitar ruídos, utiliza-se os inputs do bounce como `INPUT_PULLUP`.
+
+
+
+
+
