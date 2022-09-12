@@ -17,20 +17,12 @@ namespace Tera
         };
         void recuar(Servo& ESC)
         {
-            Serial.println(ESC.readMicroseconds());
-            if (ESC.readMicroseconds() == aceleracao::maxima)
-            {
-                
-                ESC.writeMicroseconds(aceleracao::re);
-                delay(50);
-                ESC.writeMicroseconds(aceleracao::nula);
-                delay(50);
-                ESC.writeMicroseconds(aceleracao::re);
-            }
-            else
-            {
-                ESC.writeMicroseconds(aceleracao::re);
-            }
+
+            ESC.writeMicroseconds(aceleracao::re);
+            delay(50);
+            ESC.writeMicroseconds(aceleracao::nula);
+            delay(50);
+            ESC.writeMicroseconds(aceleracao::re);
         }
 
     }
