@@ -7,8 +7,8 @@ short pino_ir_4{4};
 
 
 Ultrasonic ultra1(5,6);//Ultrasonic ultra1(trig,echo);
-Ultrasonic ultra1(7,8);
-Ultrasonic ultra1(9,10);
+Ultrasonic ultra2(7,8);
+Ultrasonic ultra3(9,10);
 
 
 void setup()
