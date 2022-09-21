@@ -1,41 +1,61 @@
+#include <Servo.h>
+#include "comandos_movimento.h"
 #include <Ultrasonic.h>
 
-short pino_ir_1{1};
-short pino_ir_2{2};
-short pino_ir_3{3};
-short pino_ir_4{4};
 
 
-Ultrasonic ultra1(5,6);//Ultrasonic ultra1(trig,echo);
-Ultrasonic ultra2(7,8);
-Ultrasonic ultra3(9,10);
+short pino_ir_1{2};
+short pino_ir_2{3};
+short pino_ir_3{4};
+short pino_ir_4{12};
+short pino_ESC{11};
+
+using namespace Tera::movimento;
+Ultrasonic ultra_direita(5,6);//Ultrasonic ultra1(trig,echo);
+Ultrasonic ultra_meio(7,8);
+Ultrasonic ultra_esquerda(9,10);
+Servo ESC;
+
+void attack()
+{
+    ESC.writeMicroseconds(aceleracao::maxima);//move com toda força pra frente
+    Serial.println("Attack");
+}
+
+void parar()
+{
+    ESC.writeMicroseconds(aceleracao::nula);//para o movimento do motor
+    Serial.println("Parar");
+}
 
 
 void setup()
 {
     Serial.begin(115200);
+    ESC.attach(11);
     pinMode(pino_ir_1, INPUT);
     pinMode(pino_ir_2, INPUT);
     pinMode(pino_ir_3, INPUT);
     pinMode(pino_ir_4, INPUT);
 }
 
+int dist_meio{};
+
 void loop()
 {
-    delay(2000);
-    Serial.print("ir_1 = ");
-    Serial.println(digitalRead(pino_ir_1));
-    Serial.print("ir_2 = ");
-    Serial.println(digitalRead(pino_ir_2));
-    Serial.print("ir_3 = ");
-    Serial.println(digitalRead(pino_ir_3));
-    Serial.print("ir_4 = ");
-    Serial.println(digitalRead(pino_ir_4));
-    Serial.print("ultra_1 = ");
-    Serial.println(ultra1.read());
-    Serial.print("ultra_2 = ");
-    Serial.println(ultra2.read());
-    Serial.print("ultra_3 = ");
-    Serial.println(ultra3.read());
+    dist_meio = ultra_meio.read();
+    Serial.print("dist_meio = ");
+    Serial.println(dist_meio);
+    // delay(2000);
+    if(dist_meio != 0 && dist_meio < 70)
+    {
+        attack();
+    }
+    else
+    {
+        parar();
+        
+    }
+
 
 }
