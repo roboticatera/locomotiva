@@ -49,7 +49,7 @@ void loop()
     // delay(2000);
     if(dist_meio != 0 && dist_meio < 70)
     {
-        attack();
+        ataque();
     }
     else
     {
