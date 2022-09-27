@@ -16,7 +16,7 @@ Ultrasonic ultra_meio(7,8);
 Ultrasonic ultra_esquerda(9,10);
 Servo ESC;
 
-void attack()
+void ataque()
 {
     ESC.writeMicroseconds(aceleracao::maxima);//move com toda força pra frente
     Serial.println("Attack");
