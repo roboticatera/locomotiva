@@ -1,7 +1,8 @@
 #include "Bounce2.h"
 #include <Servo.h>
 
-
+#ifndef _COMANDOS_MOVIMENTO_H_
+#define _COMANDOS_MOVIMENTO_H_
 
 namespace Tera
 {
@@ -15,17 +16,11 @@ namespace Tera
             nula = 1480,
             maxima = 1800
         };
-        void recuar(Servo& ESC)
-        {
 
-            ESC.writeMicroseconds(aceleracao::re);
-            delay(50);
-            ESC.writeMicroseconds(aceleracao::nula);
-            delay(50);
-            ESC.writeMicroseconds(aceleracao::re);
-        }
-
+        void recuar(Servo& ESC);
+        
     }
 }
 
 
+#endif // _COMANDOS_MOVIMENTO_H_
