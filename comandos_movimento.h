@@ -1,6 +1,3 @@
-#include "Bounce2.h"
-#include <Servo.h>
-
 #ifndef _COMANDOS_MOVIMENTO_H_
 #define _COMANDOS_MOVIMENTO_H_
 
@@ -17,7 +14,7 @@ namespace Tera
             maxima = 1800
         };
 
-        void recuar(Servo& ESC);
+        void recuar(Servo & ESC);
         
     }
 }
