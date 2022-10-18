@@ -1,7 +1,7 @@
 #include <Servo.h>
 #include <Ultrasonic.h>
-#include "C:\Users\enzo_\Desktop\testes-robo-locomotinfraVermelhoa\comandos_movimento.h"
-using namespace Tera::movimento;
+// #include "C:\Users\enzo_\Desktop\testes-robo-locomotinfraVermelhoa\comandos_movimento.h"
+// using namespace Tera::movimento;
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -91,10 +91,10 @@ void setup()
     ESC_esquerdo.attach(pino_ESC_esquerdo);
     ESC_direito.attach(pino_ESC_direito);
 
-    pinMode(pino_infraVermelho_1, INPUT);
-    pinMode(pino_infraVermelho_2, INPUT);
-    pinMode(pino_infraVermelho_3, INPUT);
-    pinMode(pino_infraVermelho_4, INPUT);
+    pinMode(pino_infraVermelho_tras_direita, INPUT);
+    pinMode(pino_infraVermelho_frente_direita, INPUT);
+    pinMode(pino_infraVermelho_frente_esquerda, INPUT);
+    pinMode(pino_infraVermelho_tras_esquerda, INPUT);
 }
 
 void loop()
@@ -103,7 +103,7 @@ void loop()
 
     dist_meio = ultrassonico_meio.read();
     dist_esquerda = ultrassonico_esquerda.read();
-    dist_direita = ultra_direita.read();
+    dist_direita = ultrassonico_direita.read();
     
     Serial.print("dist_meio = ");
     Serial.println(dist_meio);
