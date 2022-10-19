@@ -1,7 +1,15 @@
-#include <Servo.h>
+/** 
+ * TODO: Refatora subfunções "esta_na_linha", "mudar_orientacao" e "loop". Alterando seus nomes também
+*/
+
+// Debug's
+#define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
+
+#define _DEBUG_SENSORES_ // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
+
 #include <Ultrasonic.h>
-// #include "C:\Users\enzo_\Desktop\testes-robo-locomotinfraVermelhoa\comandos_movimento.h"
-// using namespace Tera::movimento;
+#include "C:\Users\enzo_\Desktop\testes-robo-locomotiva\movimentos_basicos.h" // Muda de acordo com o caminho da sua máquina
+using namespace Tera::movimento;
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -26,60 +34,30 @@ int dist_esquerda{};
 int dist_direita{};
 bool na_linha{false};
 
-void ataque()
-{
-    // ESC.writeMicroseconds(aceleracao::maxima);//move com toda força pra frente
-    Serial.println("Attack");
-    Serial.println("ataque: Motores indo pra frente");
-}
-
-void parar()
-{
-    // ESC.writeMicroseconds(aceleracao::nula);//para o movimento do motor
-    Serial.println("Parar");
-    Serial.println("parar: motores parados");
-}
-
 bool esta_na_linha()
 {
-    // os pontos de exclamação são necessários por que a lógica do infraVermelho
-    // é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo
-    // alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1
-    // e 1 -> 0.
+    /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
     bool infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
     bool infraVermelho_frente_direita = !digitalRead(pino_infraVermelho_frente_direita);
     bool infraVermelho_frente_esquerda = !digitalRead(pino_infraVermelho_frente_esquerda);
     bool infraVermelho_tras_esquerda = !digitalRead(pino_infraVermelho_tras_esquerda);
+
     return (infraVermelho_tras_direita || infraVermelho_frente_direita || infraVermelho_frente_esquerda || infraVermelho_tras_esquerda);
-}
-
-void girar_robo_esquerda()
-{
-    Serial.println("\tgirar_robo_esquerda: girando para a esquerda");
-    delay(500);
-    Serial.println("\tgirar_robo_esquerda: motores parados");
-}
-
-void girar_robo_direita()
-{
-    Serial.println("\tgirar_robo_direita: girando para a direita");
-    delay(500);
-    Serial.println("\tgirar_robo_direita: motores parados");
 }
 
 void mudar_orientacao()
 {
     if (dist_direita != 0 && dist_direita < 70)
     {
-        girar_robo_direita();
+        girar_direita();
     }
     else if ((dist_esquerda != 0) && (dist_esquerda < 70))
     {
-        girar_robo_esquerda();
+        girar_esquerda();
     }
     else
     {
-        girar_robo_esquerda(); // potencialmente substituir essa função
+        girar_esquerda(); // potencialmente substituir essa função
                                // por uma função que gira ele em 180°
     }
 }
@@ -121,11 +99,11 @@ void loop()
 
     if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
     {
-        ataque();
+        ataque(ESC_esquerdo, ESC_direito);
     }
     else
     {
-        parar();
+        parar(ESC_esquerdo, ESC_direito);
         mudar_orientacao();
     }
 }
