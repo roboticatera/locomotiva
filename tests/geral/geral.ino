@@ -8,7 +8,7 @@
 #define _DEBUG_SENSORES_ // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <Ultrasonic.h>
-#include "C:\Users\enzo_\Desktop\testes-robo-locomotiva\movimentos_basicos.h" // Muda de acordo com o caminho da sua máquina
+#include "movimentos_basicos.h" 
 using namespace Tera::movimento;
 
 // Sensor Infravermelho
@@ -47,24 +47,31 @@ bool esta_na_linha()
 
 void mudar_orientacao()
 {
+    parar(ESC_esquerdo, ESC_direito);
     if (dist_direita != 0 && dist_direita < 70)
     {
-        girar_direita();
+        girar_direita(ESC_esquerdo, ESC_direito);
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
     }
     else if ((dist_esquerda != 0) && (dist_esquerda < 70))
     {
-        girar_esquerda();
+        girar_esquerda(ESC_esquerdo, ESC_direito);
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
     }
     else
     {
-        girar_esquerda(); // potencialmente substituir essa função
-                               // por uma função que gira ele em 180°
+        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função
+                          // por uma função que gira ele em 180°
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
     }
 }
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(9600);
 
     ESC_esquerdo.attach(pino_ESC_esquerdo);
     ESC_direito.attach(pino_ESC_direito);
@@ -77,33 +84,38 @@ void setup()
 
 void loop()
 {
+#ifdef _DEBUG_SENSORES_ 
     Serial.println("\n");
+#endif
 
     dist_meio = ultrassonico_meio.read();
     dist_esquerda = ultrassonico_esquerda.read();
     dist_direita = ultrassonico_direita.read();
     
+#ifdef _DEBUG_SENSORES_ 
     Serial.print("dist_meio = ");
     Serial.println(dist_meio);
     Serial.print("dist_direita = ");
     Serial.println(dist_direita);
     Serial.print("dist_esquerda = ");
     Serial.println(dist_esquerda);
+#endif
+
     delay(500);
-    na_linha = esta_na_linha();
+    // na_linha = esta_na_linha();
 
     /*
      * Atualmente ele simplesmente para quando encontra a linha, é necessário
      * implementar uma função que faça com que ele saia da linha uma vez que encontrou ela
      */
 
-    if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
+    // if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
+    if ((dist_meio != 0 && dist_meio < 70))
     {
-        ataque(ESC_esquerdo, ESC_direito);
+        avanco(ESC_esquerdo, ESC_direito);
     }
     else
     {
-        parar(ESC_esquerdo, ESC_direito);
         mudar_orientacao();
     }
 }

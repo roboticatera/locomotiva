@@ -1,7 +1,6 @@
 #include "movimentos_basicos.h"
 #include <Arduino.h>
 
-
 // ESC1 = ESC da direita
 // ESC2 = ESC da esquerda
 // ESC = ESC qualquer
