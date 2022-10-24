@@ -1,7 +1,3 @@
-/** 
- * TODO: Refatora subfunções "esta_na_linha", "mudar_orientacao" e "loop". Alterando seus nomes também
-*/
-
 // Debug's
 #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
 
@@ -34,7 +30,7 @@ int dist_esquerda{};
 int dist_direita{};
 bool na_linha{false};
 
-bool esta_na_linha()
+bool verifica_linha()
 {
     /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
     bool infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
@@ -62,8 +58,7 @@ void mudar_orientacao()
     }
     else
     {
-        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função
-                          // por uma função que gira ele em 180°
+        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
         delay(1000);
         parar(ESC_esquerdo, ESC_direito);
     }

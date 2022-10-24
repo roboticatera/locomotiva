@@ -14,7 +14,7 @@ void Tera::movimento::inverter_motor(Servo & ESC)
   ESC.writeMicroseconds(aceleracao::re);
 
   #ifdef _DEBUG_MOVIMENTOS_
-  // Serial.println("Invertendo motor");
+  Serial.println("Invertendo motor");
   #endif
 }
 
