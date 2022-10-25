@@ -63,15 +63,14 @@ void loop()
 #ifdef _DEBUG_SENSORES_
     Serial.println("\n");
     Serial.println("Sensores Ultrassônicos:");
-    Serial.println("dist_meio = " + dist_meio);
-    Serial.println("dist_direita = " + dist_direita);
-    Serial.println("dist_esquerda = " + dist_esquerda);
-
+    Serial.println("dist_meio = " + (String)dist_meio);
+    Serial.println("dist_direita = " + (String)dist_direita);
+    Serial.println("dist_esquerda = " + (String)dist_esquerda);
     Serial.println("Sensores Infravermelhos:");
-    Serial.println("infraVermelho_tras_direita = " + infraVermelho_tras_direita);
-    Serial.println("infraVermelho_frente_direita = " + infraVermelho_frente_direita);
-    Serial.println("infraVermelho_frente_esquerda = " + infraVermelho_frente_esquerda);
-    Serial.println("infraVermelho_tras_esquerda = " + infraVermelho_tras_esquerda);
+    Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
+    Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
+    Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
+    Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
 #endif
 
     delay(500);
