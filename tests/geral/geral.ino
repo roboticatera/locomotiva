@@ -1,11 +1,22 @@
 // Debug's
-#define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
-
-#define _DEBUG_SENSORES_ // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
+// #define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
+// #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
+// #define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <Ultrasonic.h>
+#include <IRremote.hpp>
 #include "movimentos_basicos.h"
+
 using namespace Tera::movimento;
+
+// Microstart
+short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
+short buzzer{13};
+const long stop = 0xE0E036C9;               // Botão A do controle remoto
+const long ready = 0xE0E0A857;              // Botão C do controle remoto
+const long start = 0xE0E028D7;              // Botão B do controle remoto
+IRrecv irrecv(pino_receptor_infravermelho); // Passa o Parâmetro para a função irrecv
+decode_results status;                      // Variável que armazena os resultados do receptor infravermelho
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -38,17 +49,63 @@ void setup()
 {
     Serial.begin(9600);
 
-    ESC_esquerdo.attach(pino_ESC_esquerdo);
-    ESC_direito.attach(pino_ESC_direito);
+    pinMode(LED_BUILTIN, OUTPUT);
+    irrecv.enableIRIn(); // inicia a recepção dos sinais
 
     pinMode(pino_infraVermelho_tras_direita, INPUT);
     pinMode(pino_infraVermelho_frente_direita, INPUT);
     pinMode(pino_infraVermelho_frente_esquerda, INPUT);
     pinMode(pino_infraVermelho_tras_esquerda, INPUT);
+
+    ESC_esquerdo.attach(pino_ESC_esquerdo);
+    ESC_direito.attach(pino_ESC_direito);
 }
 
 void loop()
 {
+    if (irrecv.decode(&status)) // se algum código for recebido
+    {
+#ifdef _DEBUG_MICROSTART_
+        Serial.print("Código HEX do Botao: ");
+        Serial.println(status.value, HEX); // imprime o HEX
+        Serial.print("Status: ");
+#endif
+
+        if (status.value == stop)
+        {
+#ifdef _DEBUG_MICROSTART_
+            Serial.println("Stop");
+#endif
+            digitalWrite(buzzer, HIGH);
+            delay(500);
+            while (true)
+            {
+            }
+        }
+        else if (status.value == ready)
+        {
+            digitalWrite(buzzer, HIGH);
+            delay(5);
+            digitalWrite(buzzer, LOW);
+            delay(5);
+            digitalWrite(buzzer, HIGH);
+            delay(5);
+            digitalWrite(buzzer, LOW);
+#ifdef _DEBUG_MICROSTART_
+            Serial.println("Ready");
+#endif
+        }
+        else if (status.value == start)
+        {
+            digitalWrite(LED_BUILTIN, HIGH);
+#ifdef _DEBUG_MICROSTART_
+            Serial.println("Start");
+#endif
+        }
+
+        irrecv.resume(); // reinicializa o receptor
+    }
+
     // Aquisição de dados
     dist_meio = ultrassonico_meio.read();
     dist_esquerda = ultrassonico_esquerda.read();
@@ -66,6 +123,7 @@ void loop()
     Serial.println("dist_meio = " + (String)dist_meio);
     Serial.println("dist_direita = " + (String)dist_direita);
     Serial.println("dist_esquerda = " + (String)dist_esquerda);
+
     Serial.println("Sensores Infravermelhos:");
     Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
     Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
@@ -73,7 +131,7 @@ void loop()
     Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
 #endif
 
-    delay(500);
+    delay(250);
 
     /*
      * Atualmente ele simplesmente para quando encontra a linha, é necessário
@@ -81,11 +139,11 @@ void loop()
      */
 
     // if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
-    if ((dist_meio != 0 && dist_meio < 70))
+    if ((dist_meio != 0 && dist_meio < 70) && status.value == start)
     {
         avanco(ESC_esquerdo, ESC_direito);
     }
-    else
+    else if (status.value == start)
     {
         mudar_orientacao();
     }
@@ -94,13 +152,13 @@ void loop()
 void saiu_do_ringue()
 {
 
-    if (infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true)
+    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true) && status.value == start)
     {
         recuar(ESC_esquerdo, ESC_direito);
         delay(50);
         mudar_orientacao();
     }
-    else if (infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true)
+    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true) && status.value == start)
     {
         avanco(ESC_esquerdo, ESC_direito);
         delay(50);
