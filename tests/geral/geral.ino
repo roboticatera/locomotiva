@@ -4,7 +4,7 @@
 #define _DEBUG_SENSORES_ // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <Ultrasonic.h>
-#include "movimentos_basicos.h" 
+#include "movimentos_basicos.h"
 using namespace Tera::movimento;
 
 // Sensor Infravermelho
@@ -28,41 +28,11 @@ Servo ESC_direito;
 int dist_meio{};
 int dist_esquerda{};
 int dist_direita{};
-bool na_linha{false};
 
-bool verifica_linha()
-{
-    /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
-    bool infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
-    bool infraVermelho_frente_direita = !digitalRead(pino_infraVermelho_frente_direita);
-    bool infraVermelho_frente_esquerda = !digitalRead(pino_infraVermelho_frente_esquerda);
-    bool infraVermelho_tras_esquerda = !digitalRead(pino_infraVermelho_tras_esquerda);
-
-    return (infraVermelho_tras_direita || infraVermelho_frente_direita || infraVermelho_frente_esquerda || infraVermelho_tras_esquerda);
-}
-
-void mudar_orientacao()
-{
-    parar(ESC_esquerdo, ESC_direito);
-    if (dist_direita != 0 && dist_direita < 70)
-    {
-        girar_direita(ESC_esquerdo, ESC_direito);
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
-    else if ((dist_esquerda != 0) && (dist_esquerda < 70))
-    {
-        girar_esquerda(ESC_esquerdo, ESC_direito);
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
-    else
-    {
-        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
-}
+bool infraVermelho_tras_direita{false};
+bool infraVermelho_frente_direita{false};
+bool infraVermelho_frente_esquerda{false};
+bool infraVermelho_tras_esquerda{false};
 
 void setup()
 {
@@ -79,25 +49,31 @@ void setup()
 
 void loop()
 {
-#ifdef _DEBUG_SENSORES_ 
-    Serial.println("\n");
-#endif
-
+    // Aquisição de dados
     dist_meio = ultrassonico_meio.read();
     dist_esquerda = ultrassonico_esquerda.read();
     dist_direita = ultrassonico_direita.read();
-    
-#ifdef _DEBUG_SENSORES_ 
-    Serial.print("dist_meio = ");
-    Serial.println(dist_meio);
-    Serial.print("dist_direita = ");
-    Serial.println(dist_direita);
-    Serial.print("dist_esquerda = ");
-    Serial.println(dist_esquerda);
+
+    /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
+    infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
+    infraVermelho_frente_direita = !digitalRead(pino_infraVermelho_frente_direita);
+    infraVermelho_frente_esquerda = !digitalRead(pino_infraVermelho_frente_esquerda);
+    infraVermelho_tras_esquerda = !digitalRead(pino_infraVermelho_tras_esquerda);
+
+#ifdef _DEBUG_SENSORES_
+    Serial.println("\n");
+    Serial.println("Sensores Ultrassônicos:");
+    Serial.println("dist_meio = " + (String)dist_meio);
+    Serial.println("dist_direita = " + (String)dist_direita);
+    Serial.println("dist_esquerda = " + (String)dist_esquerda);
+    Serial.println("Sensores Infravermelhos:");
+    Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
+    Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
+    Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
+    Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
 #endif
 
     delay(500);
-    // na_linha = esta_na_linha();
 
     /*
      * Atualmente ele simplesmente para quando encontra a linha, é necessário
@@ -112,5 +88,45 @@ void loop()
     else
     {
         mudar_orientacao();
+    }
+}
+
+void saiu_do_ringue()
+{
+
+    if (infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true)
+    {
+        recuar(ESC_esquerdo, ESC_direito);
+        delay(50);
+        mudar_orientacao();
+    }
+    else if (infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true)
+    {
+        avanco(ESC_esquerdo, ESC_direito);
+        delay(50);
+        mudar_orientacao();
+    }
+}
+
+void mudar_orientacao()
+{
+    parar(ESC_esquerdo, ESC_direito);
+    if (dist_direita != 0 && dist_direita < 70)
+    {
+        girar_direita(ESC_esquerdo, ESC_direito);
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
+    }
+    else if ((dist_esquerda != 0) && (dist_esquerda < 70)) // Qual a diferença entre com e sem parênteses?
+    {
+        girar_esquerda(ESC_esquerdo, ESC_direito);
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
+    }
+    else
+    {
+        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
+        delay(1000);
+        parar(ESC_esquerdo, ESC_direito);
     }
 }

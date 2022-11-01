@@ -1,9 +1,8 @@
 #include "movimentos_basicos.h"
 #include <Arduino.h>
 
-
-// ESC1 = ESC da direita
-// ESC2 = ESC da esquerda
+// ESC1 = ESC da esquerda
+// ESC2 = ESC da direita
 // ESC = ESC qualquer
 
 void Tera::movimento::inverter_motor(Servo & ESC)
@@ -15,7 +14,7 @@ void Tera::movimento::inverter_motor(Servo & ESC)
   ESC.writeMicroseconds(aceleracao::re);
 
   #ifdef _DEBUG_MOVIMENTOS_
-  // Serial.println("Invertendo motor");
+  Serial.println("Invertendo motor");
   #endif
 }
 
