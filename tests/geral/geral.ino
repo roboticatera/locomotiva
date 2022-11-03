@@ -11,7 +11,6 @@ using namespace Tera::movimento;
 
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
-short buzzer{13};
 const long stop = 0xE0E036C9;               // Botão A do controle remoto
 const long ready = 0xE0E0A857;              // Botão C do controle remoto
 const long start = 0xE0E028D7;              // Botão B do controle remoto
@@ -76,21 +75,20 @@ void loop()
 #ifdef _DEBUG_MICROSTART_
             Serial.println("Stop");
 #endif
-            digitalWrite(buzzer, HIGH);
-            delay(500);
+            digitalWrite(LED_BUILTIN, HIGH);
             while (true)
             {
             }
         }
         else if (status.value == ready)
         {
-            digitalWrite(buzzer, HIGH);
+            digitalWrite(LED_BUILTIN, HIGH);
             delay(5);
-            digitalWrite(buzzer, LOW);
+            digitalWrite(LED_BUILTIN, LOW);
             delay(5);
-            digitalWrite(buzzer, HIGH);
+            digitalWrite(LED_BUILTIN, HIGH);
             delay(5);
-            digitalWrite(buzzer, LOW);
+            digitalWrite(LED_BUILTIN, LOW);
 #ifdef _DEBUG_MICROSTART_
             Serial.println("Ready");
 #endif
