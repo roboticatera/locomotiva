@@ -12,11 +12,15 @@ using namespace Tera::movimento;
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
 short buzzer{13};
-const long stop = 0xE0E036C9;                        // Botão A do controle remoto
-const long ready = 0xE0E0A857;                       // Botão C do controle remoto
-const long start = 0xE0E028D7;                       // Botão B do controle remoto
-volatile IRrecv irrecv(pino_receptor_infravermelho); // Passa o Parâmetro para a função irrecv
-volatile decode_results status;                      // Variável que armazena os resultados do receptor infravermelho
+// valores lidos com o novo método de decodificação
+// stop - 4BA5
+// start - 4BA6
+// ready - 4BA7
+const long stop = 0xE0E036C9;                        // Botão Vermeho do controle remoto
+const long ready = 0xE0E0A857;                       // Botão Verde do controle remoto
+const long start = 0xE0E028D7;                       // Botão Amarelo do controle remoto
+//volatile IRrecv irrecv(pino_receptor_infravermelho); // Passa o Parâmetro para a função irrecv
+//volatile decode_results status;                      // Variável que armazena os resultados do receptor infravermelho
 void tijolar_se_necessario();                        // Função para ser adiciomada como callback
 
 // Sensor Infravermelho
@@ -63,7 +67,7 @@ void setup()
     ESC_esquerdo.attach(pino_ESC_esquerdo);
     ESC_direito.attach(pino_ESC_direito);
     parar(ESC_esquerdo, ESC_direito);
-    while (IrReceiver.decodedIRData.command != start)
+    while (IrReceiver.decodedIRData.decodedRawData != start)
     {
         // Espera até o sinal de start
         // o sinal deve ser processado no callback assim que terminar de ser recebido
@@ -120,7 +124,7 @@ void tijolar_se_necessario()
     // use decode() without a parameter and IrReceiver.decodedIRData.<fieldname> .
     if (IrReceiver.decode())
     {
-        if (IrReceiver.decodedIRData.command == stop)
+        if (IrReceiver.decodedIRData.decodedRawData == stop)
         {
             delayMicroseconds(5);
             parar(ESC_esquerdo, ESC_direito);
@@ -133,7 +137,7 @@ void tijolar_se_necessario()
             {
             }
         }
-        else if ( IrReceiver.decodedIRData.command == start)
+        else if ( IrReceiver.decodedIRData.decodedRawData == start)
         {
             #ifdef _DEBUG_MICROSTART_
             Serial.println("Sinal START");
@@ -144,7 +148,7 @@ void tijolar_se_necessario()
         else
         {
             Serial.print("Valor do sinal: ");
-            Serial.println(IrReceiver.decodedIRData.command);
+            Serial.println(IrReceiver.decodedIRData.decodedRawData,HEX);
         }
         #endif
     }
