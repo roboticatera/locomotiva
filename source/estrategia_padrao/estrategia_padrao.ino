@@ -1,7 +1,7 @@
 // Debug's
-// #define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
+#define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
 #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
-#define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
+//#define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <IRremote.hpp>
 #include <Ultrasonic.h>
@@ -92,11 +92,11 @@ void loop()
     Serial.println("dist_direita = " + (String)dist_direita);
     Serial.println("dist_esquerda = " + (String)dist_esquerda);
 
-    // Serial.println("Sensores Infravermelhos:");
-    // Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
-    // Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
-    // Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
-    // Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
+    Serial.println("Sensores Infravermelhos:");
+    Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
+    Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
+    Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
+    Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
 #endif
 
     delay(250);
@@ -124,7 +124,9 @@ void tijolar_se_necessario()
         {
             delayMicroseconds(5);
             parar(ESC_esquerdo, ESC_direito);
+            #ifdef _DEBUG_MICROSTART_
             Serial.println("Sinal STOP");
+            #endif
             // add code to beep the buzzer
             digitalWrite(LED_BUILTIN, HIGH);
             while (true)
@@ -133,14 +135,18 @@ void tijolar_se_necessario()
         }
         else if ( IrReceiver.decodedIRData.command == start)
         {
+            #ifdef _DEBUG_MICROSTART_
             Serial.println("Sinal START");
+            #endif
             digitalWrite(LED_BUILTIN, HIGH);
         }
+        #ifdef _DEBUG_MICROSTART_
         else
         {
             Serial.print("Valor do sinal: ");
             Serial.println(IrReceiver.decodedIRData.command);
         }
+        #endif
     }
 
     IrReceiver.resume();
