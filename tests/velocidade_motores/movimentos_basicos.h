@@ -15,7 +15,7 @@ namespace Tera
             maxima = 1800
         };
 
-        void inverter_motor(Servo & ESC);
+        void avanco_motor(Servo & ESC);
         void recuar(Servo & ESC1, Servo & ESC2);
         void avanco(Servo & ESC1, Servo & ESC2);
         void parar(Servo & ESC1, Servo & ESC2);

@@ -9,13 +9,13 @@ namespace Tera
 
         enum aceleracao : int // no arduino short é 2 bytes, então os valores só vão até 65535
         {
-            minima = 1080,
-            re = 1080, // para auxiliar também na expressividade do código
+            minima = 1800,
+            re = 1800, // para auxiliar também na expressividade do código
             nula = 1480,
-            maxima = 1800
+            maxima = 1080
         };
 
-        void inverter_motor(Servo & ESC);
+        void avanco_motor(Servo & ESC);
         void recuar(Servo & ESC1, Servo & ESC2);
         void avanco(Servo & ESC1, Servo & ESC2);
         void parar(Servo & ESC1, Servo & ESC2);

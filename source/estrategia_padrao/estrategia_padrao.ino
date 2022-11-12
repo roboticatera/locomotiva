@@ -1,7 +1,7 @@
 // Debug's
-#define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
-#define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
-//#define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
+// #define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
+// #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
+// #define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <IRremote.hpp>
 #include <Ultrasonic.h>
@@ -11,17 +11,11 @@ using namespace Tera::movimento;
 
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
-short buzzer{13};
-// valores lidos com o novo método de decodificação
-// stop - 4BA5
-// start - 4BA6
-// ready - 4BA7
-const long stop = 0xE0E036C9;                        // Botão Vermeho do controle remoto
-const long ready = 0xE0E0A857;                       // Botão Verde do controle remoto
-const long start = 0xE0E028D7;                       // Botão Amarelo do controle remoto
-//volatile IRrecv irrecv(pino_receptor_infravermelho); // Passa o Parâmetro para a função irrecv
-//volatile decode_results status;                      // Variável que armazena os resultados do receptor infravermelho
-void tijolar_se_necessario();                        // Função para ser adiciomada como callback
+
+const long stop = 0x4BA5;  // Botão Vermelho do controle remoto
+const long ready = 0x4BA6; // Botão Verde do controle remoto
+const long start = 0x4BA7; // Botão Amarelo do controle remoto
+void microstart();         // Função para ser adiciomada como callback
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -52,12 +46,13 @@ bool infraVermelho_tras_esquerda{false};
 
 void setup()
 {
-    Serial.begin(9600);
+#ifdef _DEBUG_MICROSTART_ || _DEBUG_SENSORES_ || _DEBUG_MOVIMENTOS_
+    Serial.begin(115200);
+#endif
 
-    pinMode(LED_BUILTIN, OUTPUT);
-    IrReceiver.begin(pino_receptor_infravermelho); // inicia a recepção dos sinais
-    // adicionar tijolar_se_necessario como callback
-    IrReceiver.registerReceiveCompleteCallback(tijolar_se_necessario);
+    IrReceiver.begin(pino_receptor_infravermelho, ENABLE_LED_FEEDBACK); // inicia a recepção dos sinais
+    // adicionar microstart como callback
+    IrReceiver.registerReceiveCompleteCallback(microstart);
 
     pinMode(pino_infraVermelho_tras_direita, INPUT);
     pinMode(pino_infraVermelho_frente_direita, INPUT);
@@ -66,13 +61,13 @@ void setup()
 
     ESC_esquerdo.attach(pino_ESC_esquerdo);
     ESC_direito.attach(pino_ESC_direito);
+    delay(1);
     parar(ESC_esquerdo, ESC_direito);
     while (IrReceiver.decodedIRData.decodedRawData != start)
     {
         // Espera até o sinal de start
         // o sinal deve ser processado no callback assim que terminar de ser recebido
     }
-    delay(5000);
 }
 
 void loop()
@@ -110,6 +105,7 @@ void loop()
     if ((dist_meio != 0 && dist_meio < 70))
     {
         avanco(ESC_esquerdo, ESC_direito);
+        delayMicroseconds(50);
     }
     else
     {
@@ -117,56 +113,47 @@ void loop()
     }
 }
 
-void tijolar_se_necessario()
+void microstart()
 {
-    // Ao usar a função IRrecv.decode(&status):
-    // The function decode(&results)) is deprecated and may not work as expected! Just
-    // use decode() without a parameter and IrReceiver.decodedIRData.<fieldname> .
-    if (IrReceiver.decode())
+    IrReceiver.decode();
+    if (IrReceiver.decodedIRData.decodedRawData == stop)
     {
-        if (IrReceiver.decodedIRData.decodedRawData == stop)
+        delay(50);
+        parar(ESC_esquerdo, ESC_direito);
+#ifdef _DEBUG_MICROSTART_
+        Serial.println("Sinal STOP");
+#endif
+        while (true)
         {
-            delayMicroseconds(5);
-            parar(ESC_esquerdo, ESC_direito);
-            #ifdef _DEBUG_MICROSTART_
-            Serial.println("Sinal STOP");
-            #endif
-            // add code to beep the buzzer
-            digitalWrite(LED_BUILTIN, HIGH);
-            while (true)
-            {
-            }
         }
-        else if ( IrReceiver.decodedIRData.decodedRawData == start)
-        {
-            #ifdef _DEBUG_MICROSTART_
-            Serial.println("Sinal START");
-            #endif
-            digitalWrite(LED_BUILTIN, HIGH);
-        }
-        #ifdef _DEBUG_MICROSTART_
-        else
-        {
-            Serial.print("Valor do sinal: ");
-            Serial.println(IrReceiver.decodedIRData.decodedRawData,HEX);
-        }
-        #endif
     }
+    else if (IrReceiver.decodedIRData.decodedRawData == start)
+    {
+#ifdef _DEBUG_MICROSTART_
+        Serial.println("Sinal START");
+#endif
+    }
+#ifdef _DEBUG_MICROSTART_
+    else
+    {
+        Serial.print("Valor do sinal: ");
+        Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    }
+#endif
 
     IrReceiver.resume();
 }
 
-
 void saiu_do_ringue()
 {
 
-    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true) && status.value == start)
+    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true))
     {
         recuar(ESC_esquerdo, ESC_direito);
         delay(50);
         mudar_orientacao();
     }
-    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true) && status.value == start)
+    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true))
     {
         avanco(ESC_esquerdo, ESC_direito);
         delay(50);
@@ -177,6 +164,7 @@ void saiu_do_ringue()
 void mudar_orientacao()
 {
     parar(ESC_esquerdo, ESC_direito);
+    delayMicroseconds(50);
     if (dist_direita != 0 && dist_direita < 70)
     {
         girar_direita(ESC_esquerdo, ESC_direito);

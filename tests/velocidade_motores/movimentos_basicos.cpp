@@ -5,7 +5,7 @@
 // ESC2 = ESC da direita
 // ESC = ESC qualquer
 
-void Tera::movimento::inverter_motor(Servo & ESC)
+void Tera::movimento::avanco_motor(Servo & ESC)
 {
   ESC.writeMicroseconds(aceleracao::re);
   delay(50);
@@ -57,7 +57,7 @@ void Tera::movimento::parar(Servo & ESC1, Servo & ESC2)
 void Tera::movimento::girar_esquerda(Servo & ESC1, Servo & ESC2)
 {
   ESC1.writeMicroseconds(aceleracao::maxima);
-  inverter_motor(ESC2);
+  avanco_motor(ESC2);
 
   #ifdef _DEBUG_MOVIMENTOS_
   Serial.println("Girando para esquerda");
@@ -66,7 +66,7 @@ void Tera::movimento::girar_esquerda(Servo & ESC1, Servo & ESC2)
 
 void Tera::movimento::girar_direita(Servo & ESC1, Servo & ESC2)
 {
-  inverter_motor(ESC1);
+  avanco_motor(ESC1);
   ESC2.writeMicroseconds(aceleracao::maxima);
   
   #ifdef _DEBUG_MOVIMENTOS_
