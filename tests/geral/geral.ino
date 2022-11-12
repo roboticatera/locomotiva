@@ -1,11 +1,9 @@
 // Debug's
-#define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
+// #define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
 // #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
 // #define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <Ultrasonic.h>
-// #define DECODE_NEC
-// #define DECODE_DENON
 #include <IRremote.hpp>
 #include "movimentos_basicos.h"
 
@@ -13,9 +11,9 @@ using namespace Tera::movimento;
 
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
-const long stop = 0xE0E036C9;          // Botão A do controle remoto
-const long ready = 0xE0E0A857;         // Botão C do controle remoto
-const long start = 0xE0E028D7;         // Botão B do controle remoto
+const long stop = 0x4BA5;          // Botão Vermelho do controle remoto
+const long ready = 0x4BA7;         // Botão Amarelo do controle remoto
+const long start = 0x4BA6;         // Botão Verde do controle remoto
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
