@@ -11,12 +11,9 @@ using namespace Tera::movimento;
 
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
-short buzzer{13};
-const long stop = 0xE0E036C9;               // Botão A do controle remoto
-const long ready = 0xE0E0A857;              // Botão C do controle remoto
-const long start = 0xE0E028D7;              // Botão B do controle remoto
-IRrecv irrecv(pino_receptor_infravermelho); // Passa o Parâmetro para a função irrecv
-decode_results status;                      // Variável que armazena os resultados do receptor infravermelho
+const long stop = 0x4BA5;          // Botão Vermelho do controle remoto
+const long ready = 0x4BA7;         // Botão Amarelo do controle remoto
+const long start = 0x4BA6;         // Botão Verde do controle remoto
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -47,144 +44,134 @@ bool infraVermelho_tras_esquerda{false};
 
 void setup()
 {
-    Serial.begin(9600);
+  Serial.begin(115200);
 
-    pinMode(LED_BUILTIN, OUTPUT);
-    irrecv.enableIRIn(); // inicia a recepção dos sinais
+  IrReceiver.begin(pino_receptor_infravermelho, ENABLE_LED_FEEDBACK); // Inicia o receptor
 
-    pinMode(pino_infraVermelho_tras_direita, INPUT);
-    pinMode(pino_infraVermelho_frente_direita, INPUT);
-    pinMode(pino_infraVermelho_frente_esquerda, INPUT);
-    pinMode(pino_infraVermelho_tras_esquerda, INPUT);
+  pinMode(pino_infraVermelho_tras_direita, INPUT);
+  pinMode(pino_infraVermelho_frente_direita, INPUT);
+  pinMode(pino_infraVermelho_frente_esquerda, INPUT);
+  pinMode(pino_infraVermelho_tras_esquerda, INPUT);
 
-    ESC_esquerdo.attach(pino_ESC_esquerdo);
-    ESC_direito.attach(pino_ESC_direito);
+  ESC_esquerdo.attach(pino_ESC_esquerdo);
+  ESC_direito.attach(pino_ESC_direito);
 }
 
 void loop()
 {
-    if (irrecv.decode(&status)) // se algum código for recebido
+  if (IrReceiver.decode()) // se algum código for recebido
+  {
+#ifdef _DEBUG_MICROSTART_
+    Serial.print("Código HEX do Botao: ");
+    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    // imprime o HEX
+#endif
+
+    if (IrReceiver.decodedIRData.decodedRawData == stop)
     {
 #ifdef _DEBUG_MICROSTART_
-        Serial.print("Código HEX do Botao: ");
-        Serial.println(status.value, HEX); // imprime o HEX
-        Serial.print("Status: ");
+      Serial.println("Status: Stop");
 #endif
-
-        if (status.value == stop)
-        {
+      while (true)
+      {
+      }
+    }
+    else if (IrReceiver.decodedIRData.decodedRawData == ready)
+    {
 #ifdef _DEBUG_MICROSTART_
-            Serial.println("Stop");
+      Serial.println("Status: Ready");
 #endif
-            digitalWrite(buzzer, HIGH);
-            delay(500);
-            while (true)
-            {
-            }
-        }
-        else if (status.value == ready)
-        {
-            digitalWrite(buzzer, HIGH);
-            delay(5);
-            digitalWrite(buzzer, LOW);
-            delay(5);
-            digitalWrite(buzzer, HIGH);
-            delay(5);
-            digitalWrite(buzzer, LOW);
+    }
+    else if (IrReceiver.decodedIRData.decodedRawData == start)
+    {
+      digitalWrite(LED_BUILTIN, HIGH);
 #ifdef _DEBUG_MICROSTART_
-            Serial.println("Ready");
+      Serial.println("Status: Start");
 #endif
-        }
-        else if (status.value == start)
-        {
-            digitalWrite(LED_BUILTIN, HIGH);
-#ifdef _DEBUG_MICROSTART_
-            Serial.println("Start");
-#endif
-        }
-
-        irrecv.resume(); // reinicializa o receptor
     }
 
-    // Aquisição de dados
-    dist_meio = ultrassonico_meio.read();
-    dist_esquerda = ultrassonico_esquerda.read();
-    dist_direita = ultrassonico_direita.read();
+    IrReceiver.resume(); // reinicializa o receptor
+  }
 
-    /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
-    infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
-    infraVermelho_frente_direita = !digitalRead(pino_infraVermelho_frente_direita);
-    infraVermelho_frente_esquerda = !digitalRead(pino_infraVermelho_frente_esquerda);
-    infraVermelho_tras_esquerda = !digitalRead(pino_infraVermelho_tras_esquerda);
+  // Aquisição de dados
+  dist_meio = ultrassonico_meio.read();
+  dist_esquerda = ultrassonico_esquerda.read();
+  dist_direita = ultrassonico_direita.read();
+
+  /* os pontos de exclamação são necessários por que a lógica do infraVermelho é que quando ele não está lendo nada, o sinal é 1 e quando ele está lendo alguma coisa o sinal é 0. o ponto de exclamação nega os valores, trocando o 0 -> 1 e 1 -> 0.*/
+  infraVermelho_tras_direita = !digitalRead(pino_infraVermelho_tras_direita);
+  infraVermelho_frente_direita = !digitalRead(pino_infraVermelho_frente_direita);
+  infraVermelho_frente_esquerda = !digitalRead(pino_infraVermelho_frente_esquerda);
+  infraVermelho_tras_esquerda = !digitalRead(pino_infraVermelho_tras_esquerda);
 
 #ifdef _DEBUG_SENSORES_
-    Serial.println("\n");
-    Serial.println("Sensores Ultrassônicos:");
-    Serial.println("dist_meio = " + (String)dist_meio);
-    Serial.println("dist_direita = " + (String)dist_direita);
-    Serial.println("dist_esquerda = " + (String)dist_esquerda);
+  Serial.println("\n");
+  Serial.println("Sensores Ultrassônicos:");
+  Serial.println("dist_meio = " + (String)dist_meio);
+  Serial.println("dist_direita = " + (String)dist_direita);
+  Serial.println("dist_esquerda = " + (String)dist_esquerda);
 
-    Serial.println("Sensores Infravermelhos:");
-    Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
-    Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
-    Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
-    Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
+  Serial.println("Sensores Infravermelhos:");
+  Serial.println("infraVermelho_tras_direita = " + (String)infraVermelho_tras_direita);
+  Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
+  Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
+  Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
 #endif
 
-    delay(250);
+  delay(250);
 
-    /*
-     * Atualmente ele simplesmente para quando encontra a linha, é necessário
-     * implementar uma função que faça com que ele saia da linha uma vez que encontrou ela
-     */
+  /*
+     Atualmente ele simplesmente para quando encontra a linha, é necessário
+     implementar uma função que faça com que ele saia da linha uma vez que encontrou ela
+  */
 
-    // if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
-    if ((dist_meio != 0 && dist_meio < 70) && status.value == start)
-    {
-        avanco(ESC_esquerdo, ESC_direito);
-    }
-    else if (status.value == start)
-    {
-        mudar_orientacao();
-    }
+  // if ((dist_meio != 0 && dist_meio < 70) && (!na_linha))
+  if ((dist_meio != 0 && dist_meio < 70) && IrReceiver.decodedIRData.decodedRawData == start)
+  {
+    avanco(ESC_esquerdo, ESC_direito);
+  }
+  else if (IrReceiver.decodedIRData.decodedRawData == start)
+  {
+    mudar_orientacao();
+  }
 }
 
 void saiu_do_ringue()
 {
 
-    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true) && status.value == start)
-    {
-        recuar(ESC_esquerdo, ESC_direito);
-        delay(50);
-        mudar_orientacao();
-    }
-    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true) && status.value == start)
-    {
-        avanco(ESC_esquerdo, ESC_direito);
-        delay(50);
-        mudar_orientacao();
-    }
+  if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true) && IrReceiver.decodedIRData.decodedRawData == start)
+  {
+    recuar(ESC_esquerdo, ESC_direito);
+    delay(50);
+    mudar_orientacao();
+  }
+  else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true) && IrReceiver.decodedIRData.decodedRawData == start)
+  {
+    avanco(ESC_esquerdo, ESC_direito);
+    delay(50);
+    mudar_orientacao();
+  }
 }
 
 void mudar_orientacao()
 {
+  parar(ESC_esquerdo, ESC_direito);
+  if (dist_direita != 0 && dist_direita < 70)
+  {
+    girar_direita(ESC_esquerdo, ESC_direito);
+    delay(1000);
     parar(ESC_esquerdo, ESC_direito);
-    if (dist_direita != 0 && dist_direita < 70)
-    {
-        girar_direita(ESC_esquerdo, ESC_direito);
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
-    else if ((dist_esquerda != 0) && (dist_esquerda < 70)) // Qual a diferença entre com e sem parênteses?
-    {
-        girar_esquerda(ESC_esquerdo, ESC_direito);
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
-    else
-    {
-        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
-        delay(1000);
-        parar(ESC_esquerdo, ESC_direito);
-    }
+  }
+  else if ((dist_esquerda != 0) && (dist_esquerda < 70)) // Qual a diferença entre com e sem parênteses?
+  {
+    girar_esquerda(ESC_esquerdo, ESC_direito);
+    delay(1000);
+    parar(ESC_esquerdo, ESC_direito);
+  }
+  else
+  {
+    girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
+    delay(1000);
+    parar(ESC_esquerdo, ESC_direito);
+  }
 }
