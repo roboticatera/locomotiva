@@ -1,6 +1,5 @@
 // Debug's
 // #define _DEBUG_MICROSTART_ // Enquanto essa linha não for um comentário, as entradas do receptor IR serão mostrados no monitor serial
-// #define _DEBUG_MOVIMENTOS_ // Enquanto essa linha não for um comentário, movimentos do robô serão mostrados no monitor serial
 // #define _DEBUG_SENSORES_   // Enquanto essa linha não for um comentário, sensores do robô serão mostrados no monitor serial
 
 #include <IRremote.hpp>
@@ -12,10 +11,9 @@ using namespace Tera::movimento;
 // Microstart
 short pino_receptor_infravermelho{2}; // Usa o LED Interno como identificador
 
-const long stop = 0x4BA5;  // Botão Vermelho do controle remoto
-const long ready = 0x4BA6; // Botão Verde do controle remoto
-const long start = 0x4BA7; // Botão Amarelo do controle remoto
-void microstart();         // Função para ser adiciomada como callback
+const long stop = 0x4BA5; // Botão Vermelho do controle remoto
+// const long ready = ; // Botão Verde do controle remoto
+const long start = 0x4BA6; // Botão Amarelo do controle remoto
 
 // Sensor Infravermelho
 short pino_infraVermelho_tras_direita{3};
@@ -33,6 +31,8 @@ short pino_ESC_esquerdo{A1};
 short pino_ESC_direito{A2};
 Servo ESC_esquerdo;
 Servo ESC_direito;
+const int tempo_intervalo = 50;  // ms
+const int tempo_movimento = 500; // ms
 
 // Medições
 int dist_meio{};
@@ -46,14 +46,11 @@ bool infraVermelho_tras_esquerda{false};
 
 void setup()
 {
-#ifdef _DEBUG_MICROSTART_ || _DEBUG_SENSORES_ || _DEBUG_MOVIMENTOS_
-    Serial.begin(115200);
-#endif
+    // #ifdef _DEBUG_MICROSTART_ || _DEBUG_SENSORES_ || _DEBUG_MOVIMENTOS_
+        //Serial.begin(115200);
+    // #endif
 
     IrReceiver.begin(pino_receptor_infravermelho, ENABLE_LED_FEEDBACK); // inicia a recepção dos sinais
-    // adicionar microstart como callback
-    IrReceiver.registerReceiveCompleteCallback(microstart);
-
     pinMode(pino_infraVermelho_tras_direita, INPUT);
     pinMode(pino_infraVermelho_frente_direita, INPUT);
     pinMode(pino_infraVermelho_frente_esquerda, INPUT);
@@ -61,17 +58,39 @@ void setup()
 
     ESC_esquerdo.attach(pino_ESC_esquerdo);
     ESC_direito.attach(pino_ESC_direito);
-    delay(1);
-    parar(ESC_esquerdo, ESC_direito);
-    while (IrReceiver.decodedIRData.decodedRawData != start)
-    {
-        // Espera até o sinal de start
-        // o sinal deve ser processado no callback assim que terminar de ser recebido
-    }
 }
 
 void loop()
 {
+
+    IrReceiver.decode();
+    if (IrReceiver.decodedIRData.decodedRawData == stop)
+    {
+#ifdef _DEBUG_MICROSTART_
+        Serial.println("Sinal STOP");
+#endif
+        while (true)
+        {
+            parar(ESC_esquerdo, ESC_direito);
+            delay(tempo_intervalo);
+        }
+    }
+    else if (IrReceiver.decodedIRData.decodedRawData == start)
+    {
+#ifdef _DEBUG_MICROSTART_
+        Serial.println("Sinal START");
+#endif
+    }
+#ifdef _DEBUG_MICROSTART_
+    else
+    {
+        Serial.print("Valor do sinal: ");
+        Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+        Serial.println("------------------------------------------------------");
+    }
+#endif
+
+    IrReceiver.resume();
 
     // Aquisição de dados
     dist_meio = ultrassonico_meio.read();
@@ -96,67 +115,36 @@ void loop()
     Serial.println("infraVermelho_frente_direita = " + (String)infraVermelho_frente_direita);
     Serial.println("infraVermelho_frente_esquerda = " + (String)infraVermelho_frente_esquerda);
     Serial.println("infraVermelho_tras_esquerda = " + (String)infraVermelho_tras_esquerda);
+    Serial.println("------------------------------------------------------");
 #endif
-
-    delay(250);
 
     saiu_do_ringue();
 
-    if ((dist_meio != 0 && dist_meio < 70))
+    if ((dist_meio != 0 && dist_meio < 70) && IrReceiver.decodedIRData.decodedRawData == start)
     {
         avanco(ESC_esquerdo, ESC_direito);
-        delayMicroseconds(50);
-    }
-    else
-    {
-        mudar_orientacao();
-    }
-}
-
-void microstart()
-{
-    IrReceiver.decode();
-    if (IrReceiver.decodedIRData.decodedRawData == stop)
-    {
-        delay(50);
-        parar(ESC_esquerdo, ESC_direito);
-#ifdef _DEBUG_MICROSTART_
-        Serial.println("Sinal STOP");
-#endif
-        while (true)
-        {
-        }
+        delay(tempo_intervalo);
     }
     else if (IrReceiver.decodedIRData.decodedRawData == start)
     {
-#ifdef _DEBUG_MICROSTART_
-        Serial.println("Sinal START");
-#endif
+        delay(tempo_intervalo);
+        mudar_orientacao();
     }
-#ifdef _DEBUG_MICROSTART_
-    else
-    {
-        Serial.print("Valor do sinal: ");
-        Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
-    }
-#endif
-
-    IrReceiver.resume();
 }
 
 void saiu_do_ringue()
 {
 
-    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true))
+    if ((infraVermelho_frente_direita == true || infraVermelho_frente_esquerda == true) && IrReceiver.decodedIRData.decodedRawData == start)
     {
         recuar(ESC_esquerdo, ESC_direito);
-        delay(50);
+        delay(tempo_intervalo);
         mudar_orientacao();
     }
-    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true))
+    else if ((infraVermelho_tras_direita == true || infraVermelho_tras_esquerda == true) && IrReceiver.decodedIRData.decodedRawData == start)
     {
         avanco(ESC_esquerdo, ESC_direito);
-        delay(50);
+        delay(tempo_intervalo);
         mudar_orientacao();
     }
 }
@@ -164,23 +152,23 @@ void saiu_do_ringue()
 void mudar_orientacao()
 {
     parar(ESC_esquerdo, ESC_direito);
-    delayMicroseconds(50);
-    if (dist_direita != 0 && dist_direita < 70)
+    delay(tempo_intervalo);
+    if (dist_direita != 0 && dist_direita < 70  && IrReceiver.decodedIRData.decodedRawData == start)
     {
         girar_direita(ESC_esquerdo, ESC_direito);
-        delay(1000);
+        delay(tempo_movimento);
         parar(ESC_esquerdo, ESC_direito);
     }
-    else if ((dist_esquerda != 0) && (dist_esquerda < 70)) // Qual a diferença entre com e sem parênteses?
+    else if ((dist_esquerda != 0) && (dist_esquerda < 70) && IrReceiver.decodedIRData.decodedRawData == start) // Qual a diferença entre com e sem parênteses?
     {
         girar_esquerda(ESC_esquerdo, ESC_direito);
-        delay(1000);
+        delay(tempo_movimento);
         parar(ESC_esquerdo, ESC_direito);
     }
-    else
+    else if (IrReceiver.decodedIRData.decodedRawData == start)
     {
-        girar_esquerda(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
-        delay(1000);
+        girar_direita(ESC_esquerdo, ESC_direito); // potencialmente substituir essa função por uma função que gira ele em 180°
+        delay(tempo_movimento);
         parar(ESC_esquerdo, ESC_direito);
     }
 }
