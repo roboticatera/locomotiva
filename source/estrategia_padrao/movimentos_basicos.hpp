@@ -15,12 +15,14 @@ namespace Tera
             maxima = 1800
         };
 
-        void inverter_motor(Servo & ESC);
-        void recuar(Servo & ESC1, Servo & ESC2);
-        void avanco(Servo & ESC1, Servo & ESC2);
-        void parar(Servo & ESC1, Servo & ESC2);
-        void girar_esquerda(Servo & ESC1, Servo & ESC2);
-        void girar_direita(Servo & ESC1, Servo & ESC2);
+        void inverter_motor(Servo &ESC);
+        void recuar(Servo &ESC1, Servo &ESC2);
+        void avanco(Servo &ESC1, Servo &ESC2);
+        void parar(Servo &ESC1, Servo &ESC2);
+        void girar_esquerda(Servo &ESC1, Servo &ESC2);
+        void girar_direita(Servo &ESC1, Servo &ESC2);
+        void especial(Servo &ESC1, Servo &ESC2);
+
     }
 }
 #endif // _MOVIMENTOS_BASICOS_H_
