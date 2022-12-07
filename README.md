@@ -85,6 +85,11 @@ Vale ressalar que os arquivos da biblioteca interna devem estar presentes nas pa
 # Possíves melhorias para próximos projetos
 
 - Tornar a utilização da biblioteca interna mais fácil.
+- Usar Esp32 ao invés do Arduino Nano
+    - Capacidade de processamento superior.
+    - Módulos WiFi e Bluetooth embutidos.
+- Realizar projetos híbridos entre autônomo e rádio controlado, reduzindo custos para a equipe e garantindo maior orçamento e aproveitamento de tempo dos membros da equipe.
+- Junto ao tópico anterior, com o Esp32 é possível utilizar controle de vídeogame no módulo controlado, sendo mais intuívo para o piloto e possibilitando leituras da reposta do receptor infravermelho, se usarmos um controle de Playstation por exemplo.
 - Tornar funções de escritas e leitura de dados menos genéricas e mais performáticas, diminuindo o tempo de resposta de comando.
   - As implementações das funções que vem na biblioteca do arduino tem o intuito de serem genéricas, devido a isso, o código que é compilado é mais complexo do que é necessário para um única plataforma.
 
