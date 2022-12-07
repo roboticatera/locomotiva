@@ -77,7 +77,7 @@ foi finalizada. Tags também são utilizadas para marcar as versões
 finais dos códigos utilizados de fato nas competições. 
 
 Para visualizar as tags já existentes basta utilizar o commando `git tag` 
-no repositório ou no github clicar em `tags` logo ao lado de onde marca 
+no repositório ou no Github clicar em `tags` logo ao lado de onde marca 
 a branch atual.
 
 Vale ressalar que os arquivos da biblioteca interna devem estar presentes nas pastas da rotina que executar. Não conseguimos fazer com que essa biblioteca se comporte como as gerenciadas pela IDE do Arduino.
@@ -86,6 +86,14 @@ Vale ressalar que os arquivos da biblioteca interna devem estar presentes nas pa
 
 - Tornar a utilização da biblioteca interna mais fácil.
 - Tornar funções de escritas e leitura de dados menos genéricas e mais performáticas, diminuindo o tempo de resposta de comando.
+  - As implementações das funções que vem na biblioteca do arduino tem o intuito de serem genéricas, devido a isso, o código que é compilado é mais complexo do que é necessário para um única plataforma.
 
+    Com o intuito de diminuir o custo da chamada dessas funções, é interessante implementar essas funções com uma única plataforma em mente, dessa forma, podemos fazer chamadas diretas para registradores.
 
+    Essas chamadas diretas e operações em bits são menos custosas, como o intuito é utilizar uma única plataforma, então vale a pena pagar o custo de implementa-las uma vez só, já que não será algo recorrente.
+
+    material para referência: https://www.youtube.com/watch?v=6q1yEb_ukw8
+
+    não é necessário descer ao nível de assembly para realizar essas implementações, e nesse caso talvez não faça diferença no final das contas, uma vez que o compilador de C++ para o microprocessador do arduino(AVR) otimizará o máximo esse processo.
+- Como consequência do item anterior, podemos considerar estudar e implementar as funções mais básicas do ESP ou Arduino utilizando essa mesma ideia, reduzindo o custo geral do código
 
