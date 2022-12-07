@@ -94,6 +94,7 @@ Vale ressalar que os arquivos da biblioteca interna devem estar presentes nas pa
 
     material para referência: https://www.youtube.com/watch?v=6q1yEb_ukw8
 
-    não é necessário descer ao nível de assembly para realizar essas implementações, e nesse caso talvez não faça diferença no final das contas, uma vez que o compilador de C++ para o microprocessador do arduino(AVR) otimizará o máximo esse processo.
-- Como consequência do item anterior, podemos considerar estudar e implementar as funções mais básicas do ESP ou Arduino utilizando essa mesma ideia, reduzindo o custo geral do código
+    não é necessário descer ao nível de assembly para realizar essas implementações, e nesse caso talvez não faça diferença no final das contas, uma vez que o compilador de C++ para o microprocessador do ESP otimizará o máximo esse processo.
+    
+- Como consequência do item anterior, podemos considerar estudar e implementar as funções mais básicas do ESP(O que será utilizado nos futuros projetos) utilizando essa mesma ideia, reduzindo o custo geral do código
 
