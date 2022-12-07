@@ -85,6 +85,7 @@ Vale ressalar que os arquivos da biblioteca interna devem estar presentes nas pa
 # Possíves melhorias para próximos projetos
 
 - Tornar a utilização da biblioteca interna mais fácil.
+    - Talvez inserindo-a ao gerenciador de bibliotecas do próprio do Arduino  
 - Usar Esp32 ao invés do Arduino Nano
     - Capacidade de processamento superior.
     - Módulos WiFi e Bluetooth embutidos.
